@@ -43,4 +43,18 @@ const getTasksByTeam = async (team) => {
   return await Task.find({ team });
 };
 
-module.exports = { handleKpiAlert, scheduleTask, getAllTasks, getTasksByTeam };
+//this will be used to handle the forecasted anomalies and schedule maintanance tasks before the anomaly happens
+
+const handleForecastedAnomalies = async (message) => {
+  const anomalies = JSON.parse(message);
+  for (const anomaly of anomalies) {
+    const { KPI_Name, KPI_Value, Timestamp } = anomaly;
+    const taskDate = new Date(new Date(Timestamp).getTime() - 24 * 60 * 60 * 1000); // One day before the anomaly
+    const title = `Maintenance for ${KPI_Name}`;
+    const team = 'Maintenance Team'; // Assuming a generic maintenance team for now
+    const task = await scheduleTask(title, team, taskDate);
+    await sendMessage('task_queue', JSON.stringify(task));
+  }
+};
+
+module.exports = { handleKpiAlert, scheduleTask, getAllTasks, getTasksByTeam , handleForecastedAnomalies };
