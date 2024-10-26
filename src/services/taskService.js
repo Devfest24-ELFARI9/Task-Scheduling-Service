@@ -35,4 +35,12 @@ const scheduleTask = async (title, team, date) => {
   return task;
 };
 
-module.exports = { handleKpiAlert, scheduleTask };
+const getAllTasks = async () => {
+  return await Task.find();
+};
+
+const getTasksByTeam = async (team) => {
+  return await Task.find({ team });
+};
+
+module.exports = { handleKpiAlert, scheduleTask, getAllTasks, getTasksByTeam };
